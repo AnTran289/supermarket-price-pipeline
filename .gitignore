@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Large/local files
+data/raw/
+data/quality_reports/
+
+# Optional: ignore local database files
+*.db
+*.sqlite
