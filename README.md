@@ -273,13 +273,25 @@ This project can help answer questions such as:
 
 ## Screenshots
 
-Add dashboard screenshots here.
-
 ```text
-assets/screenshots/dashboard_overview.png
-assets/screenshots/promotion_summary.png
-assets/screenshots/product_search.png
-assets/screenshots/data_quality_summary.png
+Dashboard Overview
+<img width="2512" height="1087" alt="image" src="https://github.com/user-attachments/assets/dab9e850-ae37-4b64-a36e-86aea69bdbbb" />
+
+Price Comparison
+<img width="2528" height="983" alt="image" src="https://github.com/user-attachments/assets/cb48b9df-11d3-4904-8aae-39bc2aba4d42" />
+
+Unit Price Analysis
+<img width="2521" height="915" alt="image" src="https://github.com/user-attachments/assets/6786c66c-864c-4591-a7b7-ca217f0539b2" />
+
+Promotion Analysis
+<img width="2532" height="945" alt="image" src="https://github.com/user-attachments/assets/837a94a4-4b6b-4747-abd4-dc7410b85400" />
+
+Data Quality
+<img width="2521" height="767" alt="image" src="https://github.com/user-attachments/assets/4b2d9655-49ed-4368-a091-ffb69f386eef" />
+
+Silver Data Explorer
+<img width="2538" height="500" alt="image" src="https://github.com/user-attachments/assets/7655f4cf-c275-4a92-8798-0786a8b8f3b4" />
+
 ```
 
 Example:
