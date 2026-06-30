@@ -338,6 +338,32 @@ This project demonstrates practical Data Engineering skills including:
 
 ---
 
+## Version 2: dbt Transformation Layer
+
+In v2, the project was upgraded from manually created SQL Gold views to dbt-managed transformations and tests.
+
+Updated pipeline:
+
+CSV data
+→ Python validation
+→ PostgreSQL Silver table
+→ dbt staging model
+→ dbt Gold marts
+→ dbt tests
+→ Streamlit dashboard
+
+dbt models:
+
+| Model | Purpose |
+|---|---|
+| `stg_supermarket_prices` | Staging model built from the Silver table |
+| `mart_price_comparison` | Product-level price comparison |
+| `mart_promotion_summary` | Promotion summary by supermarket |
+| `mart_cheapest_unit_products` | Cheapest products by unit price |
+| `mart_data_quality_summary` | Data quality summary |
+
+---
+
 ## Author
 
 Quoc Van Khanh An Tran (An Tran)
