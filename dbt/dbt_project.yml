@@ -1,0 +1,18 @@
+#staging models → silver schema
+#marts models → gold schema
+name: supermarket_price_pipeline
+version: "2.0.0"
+config-version: 2
+
+profile: supermarket_price_pipeline
+
+model-paths: ["models"]
+
+models:
+  supermarket_price_pipeline:
+    staging:
+      +materialized: view
+      +schema: silver
+    marts:
+      +materialized: view
+      +schema: gold

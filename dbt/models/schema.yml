@@ -1,0 +1,48 @@
+# describes dbt models and tests
+version: 2
+
+sources:
+  - name: silver
+    schema: silver
+    tables:
+      - name: supermarket_prices
+        description: Cleaned supermarket product price data loaded from CSV into PostgreSQL.
+
+models:
+  - name: stg_supermarket_prices
+    description: Cleaned staging model for supermarket product price data.
+    columns:
+      - name: combined_product_id
+        description: Global unique product row ID.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: product_name
+        description: Full product title.
+        data_tests:
+          - not_null
+
+      - name: current_price
+        description: Current product price.
+        data_tests:
+          - not_null
+
+      - name: supermarket
+        description: Supermarket source.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["Coles", "Woolworths", "Aldi"]
+
+  - name: mart_price_comparison
+    description: Gold mart for product-level price comparison.
+
+  - name: mart_promotion_summary
+    description: Gold mart summarising promotions by supermarket.
+
+  - name: mart_cheapest_unit_products
+    description: Gold mart containing products with valid unit prices.
+
+  - name: mart_data_quality_summary
+    description: Gold mart summarising data quality issues by supermarket.

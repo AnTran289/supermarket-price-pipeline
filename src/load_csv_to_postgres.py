@@ -1,18 +1,25 @@
 from pathlib import Path
-import pandas as pd
-from sqlalchemy import create_engine, text
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
+import pandas as pd
+from dotenv import load_dotenv
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import URL
 
-CSV_PATH = Path("data/silver/supermarket_prices_silver.csv")
+# --------------------------------------------------
+# Project paths
+# --------------------------------------------------
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-SQL_FILES = [
-    "sql/01_create_schemas.sql",
-    "sql/02_create_silver_table.sql",
-    "sql/03_create_gold_views.sql",
-]
+CSV_PATH = PROJECT_ROOT / "data" / "silver" / "supermarket_prices_silver.csv"
+
+CREATE_SCHEMAS_SQL = PROJECT_ROOT / "sql" / "01_create_schemas.sql"
+CREATE_SILVER_TABLE_SQL = PROJECT_ROOT / "sql" / "02_create_silver_table.sql"
+
+# --------------------------------------------------
+# Load environment variables
+# --------------------------------------------------
+load_dotenv(PROJECT_ROOT / ".env")
 
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -20,26 +27,59 @@ DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 
-engine = create_engine(
-    f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+required_env_vars = {
+    "DB_USER": DB_USER,
+    "DB_PASSWORD": DB_PASSWORD,
+    "DB_HOST": DB_HOST,
+    "DB_PORT": DB_PORT,
+    "DB_NAME": DB_NAME,
+}
+
+missing_vars = [key for key, value in required_env_vars.items() if not value]
+
+if missing_vars:
+    raise ValueError(
+        f"Missing environment variables: {missing_vars}. "
+        "Check that .env exists in the project root and has one variable per line."
+    )
+
+DATABASE_URL = URL.create(
+    drivername="postgresql+psycopg2",
+    username=DB_USER,
+    password=DB_PASSWORD,
+    host=DB_HOST,
+    port=int(DB_PORT),
+    database=DB_NAME,
 )
 
+engine = create_engine(DATABASE_URL)
 
-def run_sql_file(path):
-    sql_text = Path(path).read_text(encoding="utf-8")
-    statements = [statement.strip() for statement in sql_text.split(";") if statement.strip()]
+
+# --------------------------------------------------
+# Helper function
+# --------------------------------------------------
+def run_sql_file(path: Path):
+    sql_text = path.read_text(encoding="utf-8")
+    statements = [
+        statement.strip()
+        for statement in sql_text.split(";")
+        if statement.strip()
+    ]
 
     with engine.begin() as conn:
         for statement in statements:
             conn.execute(text(statement))
 
 
+# --------------------------------------------------
+# Main pipeline step
+# --------------------------------------------------
 def main():
     print("Creating schemas...")
-    run_sql_file("sql/01_create_schemas.sql")
+    run_sql_file(CREATE_SCHEMAS_SQL)
 
     print("Creating silver table...")
-    run_sql_file("sql/02_create_silver_table.sql")
+    run_sql_file(CREATE_SILVER_TABLE_SQL)
 
     print("Reading CSV...")
     df = pd.read_csv(CSV_PATH)
@@ -60,6 +100,11 @@ def main():
         "supermarket",
     ]
 
+    missing_columns = [col for col in expected_order if col not in df.columns]
+
+    if missing_columns:
+        raise ValueError(f"Missing columns in CSV: {missing_columns}")
+
     df = df[expected_order]
 
     print("Loading CSV into PostgreSQL...")
@@ -73,11 +118,10 @@ def main():
         chunksize=1000,
     )
 
-    print("Creating Gold views...")
-    run_sql_file("sql/03_create_gold_views.sql")
-
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT COUNT(*) FROM silver.supermarket_prices;"))
+        result = conn.execute(
+            text("SELECT COUNT(*) FROM silver.supermarket_prices;")
+        )
         row_count = result.scalar()
 
     print(f"Pipeline finished successfully. Loaded {row_count} rows.")
