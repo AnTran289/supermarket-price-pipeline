@@ -1,6 +1,6 @@
 # Supermarket Price Intelligence Pipeline
 
-An end-to-end Data Engineering project that processes supermarket product pricing data from **Coles**, **Woolworths**, and **Aldi**.
+A local Data Engineering portfolio project that processes supermarket product pricing data from **Coles**, **Woolworths**, and **Aldi**.
 
 The project loads cleaned supermarket price data into **PostgreSQL**, creates analytics-ready **Gold views**, and powers a **Streamlit dashboard** for product price comparison, promotion tracking, unit price analysis, and data quality monitoring.
 
@@ -22,16 +22,15 @@ The goal of this project is to build a small but realistic data pipeline that de
 
 ## Architecture
 
-```text
-supermarket_prices_silver.csv
-        ↓
-Python CSV validation
-        ↓
-PostgreSQL silver.supermarket_prices
-        ↓
-SQL Gold views
-        ↓
-Streamlit dashboard
+**Published implementation:** Python CSV validation and loading → PostgreSQL Silver table → SQL Gold views → Streamlit. A dbt extension is described as future work, but dbt project files are not currently published in this repository.
+
+```mermaid
+flowchart TD
+  A[Silver CSV input] --> B[Python validation]
+  B --> C[PostgreSQL Silver table]
+  C --> D[SQL Gold views]
+  D --> E[Streamlit dashboard]
+  B --> F[CSV validation report]
 ```
 
 The pipeline follows a simplified medallion architecture:
@@ -122,7 +121,7 @@ supermarket-price-pipeline/
 │   ├── load_csv_to_postgres.py
 │   └── run_pipeline.py
 │
-├── .env
+├── .env  # create locally; ignored by Git
 ├── requirements.txt
 └── README.md
 ```
@@ -180,7 +179,7 @@ data/quality_reports/validation_report.csv
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/AnTran289/supermarket-price-pipeline.git
 cd supermarket-price-pipeline
 ```
 
@@ -194,11 +193,7 @@ pip install -r requirements.txt
 
 Make sure your PostgreSQL Docker container is running.
 
-Example:
-
-```bash
-docker compose up -d
-```
+This repository does not currently include a Docker Compose configuration. Start a PostgreSQL instance locally or with your own Docker setup, then configure its connection details in `.env`.
 
 ### 4. Configure database connection
 
@@ -215,6 +210,9 @@ DB_NAME=postgres
 Update the password or database name if your local PostgreSQL setup is different.
 
 ### 5. Run the pipeline
+
+The runner expects `data/silver/supermarket_prices_silver.csv` to exist locally. If this file is absent, supply your own CSV with the documented columns. **Note:** the loader currently uses `if_exists="append"`; rerunning it may duplicate data or fail on a uniqueness constraint. The pipeline is not yet idempotent.
+
 
 ```bash
 python src/run_pipeline.py
@@ -312,7 +310,9 @@ Completed:
 
 Potential future upgrades:
 
-* Add dbt for SQL transformations and testing
+* Publish a runnable dbt project for SQL transformations and testing
+* Make repeated loads idempotent
+* Add a reproducible PostgreSQL Docker Compose configuration
 * Add Airflow for orchestration
 * Add product matching across supermarkets
 * Add basket cost comparison
@@ -338,29 +338,9 @@ This project demonstrates practical Data Engineering skills including:
 
 ---
 
-## Version 2: dbt Transformation Layer
+## dbt Extension — Not Included in This Repository
 
-In v2, the project was upgraded from manually created SQL Gold views to dbt-managed transformations and tests.
-
-Updated pipeline:
-
-CSV data
-→ Python validation
-→ PostgreSQL Silver table
-→ dbt staging model
-→ dbt Gold marts
-→ dbt tests
-→ Streamlit dashboard
-
-dbt models:
-
-| Model | Purpose |
-|---|---|
-| `stg_supermarket_prices` | Staging model built from the Silver table |
-| `mart_price_comparison` | Product-level price comparison |
-| `mart_promotion_summary` | Promotion summary by supermarket |
-| `mart_cheapest_unit_products` | Cheapest products by unit price |
-| `mart_data_quality_summary` | Data quality summary |
+A dbt-based extension has been explored, but this public repository does not currently contain the dbt project files, models, or tests needed to reproduce it. The documented, published implementation uses the SQL Gold views in `sql/03_create_gold_views.sql`.
 
 ---
 
