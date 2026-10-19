@@ -46,19 +46,19 @@ def format_currency(value):
 # Load Gold Layer Data
 # --------------------------------------------------
 try:
-    price_df = load_query("SELECT * FROM gold.price_comparison;")
-    promotion_df = load_query("SELECT * FROM gold.promotion_summary;")
-    cheapest_df = load_query("SELECT * FROM gold.cheapest_unit_products;")
-    quality_df = load_query("SELECT * FROM gold.data_quality_summary;")
+    price_df = load_query("SELECT * FROM gold.mart_price_comparison;")
+    promotion_df = load_query("SELECT * FROM gold.mart_promotion_summary;")
+    cheapest_df = load_query("SELECT * FROM gold.mart_cheapest_unit_products;")
+    quality_df = load_query("SELECT * FROM gold.mart_data_quality_summary;")
 except Exception as e:
     st.error("Could not load data from PostgreSQL Gold views.")
     st.write("Please check that these views exist:")
     st.code(
         """
-gold.price_comparison
-gold.promotion_summary
-gold.cheapest_unit_products
-gold.data_quality_summary
+gold.mart_price_comparison
+gold.mart_promotion_summary
+gold.mart_cheapest_unit_products
+gold.mart_data_quality_summary
         """
     )
     st.exception(e)
