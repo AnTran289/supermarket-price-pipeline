@@ -1,6 +1,5 @@
-DROP TABLE IF EXISTS silver.supermarket_prices CASCADE;
-
-CREATE TABLE silver.supermarket_prices (
+-- Preserve existing table and dependent dbt views on repeated runs.
+CREATE TABLE IF NOT EXISTS silver.supermarket_prices (
     combined_product_id TEXT PRIMARY KEY,
     retailer_product_id TEXT,
     product_name TEXT NOT NULL,
