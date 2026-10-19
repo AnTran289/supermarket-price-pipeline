@@ -3,21 +3,21 @@ __pycache__/
 *.pyc
 .venv/
 venv/
-
+.uv-cache/
+.local/
 # Environment variables
 .env
-
 # Streamlit
 .streamlit/secrets.toml
-
 # OS files
 .DS_Store
 Thumbs.db
-
-# Large/local files
+# Generated and local data
 data/raw/
 data/quality_reports/
-
-# Optional: ignore local database files
 *.db
 *.sqlite
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+logs/

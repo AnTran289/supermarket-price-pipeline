@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 from dotenv import load_dotenv
 
 # --------------------------------------------------
@@ -11,14 +12,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5431")
+DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "postgres")
 
-DATABASE_URL = (
-    f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}"
-    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+if not DB_PASSWORD:
+    st.error("Set DB_PASSWORD in your .env file before launching the dashboard.")
+    st.stop()
+
+DATABASE_URL = URL.create(
+    "postgresql+psycopg2", username=DB_USER, password=DB_PASSWORD,
+    host=DB_HOST, port=int(DB_PORT), database=DB_NAME,
 )
 
 engine = create_engine(DATABASE_URL)
@@ -46,19 +51,19 @@ def format_currency(value):
 # Load Gold Layer Data
 # --------------------------------------------------
 try:
-    price_df = load_query("SELECT * FROM gold.price_comparison;")
-    promotion_df = load_query("SELECT * FROM gold.promotion_summary;")
-    cheapest_df = load_query("SELECT * FROM gold.cheapest_unit_products;")
-    quality_df = load_query("SELECT * FROM gold.data_quality_summary;")
+    price_df = load_query("SELECT * FROM gold.mart_price_comparison;")
+    promotion_df = load_query("SELECT * FROM gold.mart_promotion_summary;")
+    cheapest_df = load_query("SELECT * FROM gold.mart_cheapest_unit_products;")
+    quality_df = load_query("SELECT * FROM gold.mart_data_quality_summary;")
 except Exception as e:
     st.error("Could not load data from PostgreSQL Gold views.")
     st.write("Please check that these views exist:")
     st.code(
         """
-gold.price_comparison
-gold.promotion_summary
-gold.cheapest_unit_products
-gold.data_quality_summary
+gold.mart_price_comparison
+gold.mart_promotion_summary
+gold.mart_cheapest_unit_products
+gold.mart_data_quality_summary
         """
     )
     st.exception(e)

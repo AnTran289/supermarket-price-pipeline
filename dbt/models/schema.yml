@@ -1,0 +1,34 @@
+version: 2
+sources:
+  - name: silver
+    schema: silver
+    tables:
+      - name: supermarket_prices
+        description: Cleaned supermarket product pricing snapshot loaded by Python.
+models:
+  - name: stg_supermarket_prices
+    description: One row per combined product ID; includes price quality flags.
+    columns:
+      - name: combined_product_id
+        data_tests:
+          - not_null
+          - unique
+      - name: product_name
+        data_tests:
+          - not_null
+      - name: current_price
+        data_tests:
+          - not_null
+      - name: supermarket
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["Coles", "Woolworths", "Aldi"]
+  - name: mart_price_comparison
+    description: Product-level price listings; not cross-retailer product matched.
+  - name: mart_promotion_summary
+    description: Promotion statistics per supermarket.
+  - name: mart_cheapest_unit_products
+    description: Listings with available unit prices; not a category winner.
+  - name: mart_data_quality_summary
+    description: Data quality issue counts by supermarket.
